@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.vim.mapper.ImGroupMapper">
+    <resultMap type="ImGroup" id="ImGroupResult">
+        <result property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="avatar" column="avatar"/>
+        <result property="master" column="master"/>
+        <result property="announcement" column="announcement"/>
+        <result property="needCheck" column="need_check"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="delFlag" column="del_flag"/>
+        <result property="remark" column="remark"/>
+    </resultMap>
+
+    <sql id="selectImGroupVo">
+        select id,
+               name,
+               avatar,
+               master,
+               announcement,
+               need_check,
+               create_time,
+               update_time,
+               create_by,
+               update_by,
+               del_flag,
+               remark
+        from im_group
+    </sql>
+    <select id="getUserGroups" parameterType="string" resultMap="ImGroupResult">
+        <include refid="selectImGroupVo"/>
+        WHERE id IN (SELECT cg.group_id
+        FROM im_group_user cg
+        WHERE cg.user_id = #{userId} and cg.del_flag='0') and del_flag='0'
+    </select>
+
+    <resultMap type="SysUser" id="SysUserResult">
+        <id property="userId" column="user_id"/>
+        <result property="deptId" column="dept_id"/>
+        <result property="userName" column="user_name"/>
+        <result property="nickName" column="nick_name"/>
+        <result property="email" column="email"/>
+        <result property="mobile" column="mobile"/>
+        <result property="sex" column="sex"/>
+        <result property="avatar" column="avatar"/>
+        <result property="password" column="password"/>
+        <result property="status" column="status"/>
+        <result property="delFlag" column="del_flag"/>
+        <result property="loginIp" column="login_ip"/>
+        <result property="loginDate" column="login_date"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="remark" column="remark"/>
+    </resultMap>
+
+    <select id="getGroupUsers" parameterType="string" resultMap="SysUserResult">
+        select u.user_id,
+               u.dept_id,
+               u.nick_name,
+               u.user_name,
+               u.email,
+               u.avatar,
+               u.mobile,
+               u.password,
+               u.sex,
+               u.status,
+               u.del_flag,
+               u.login_ip,
+               u.login_date,
+               u.create_by,
+               u.create_time,
+               u.remark
+        from sys_user u
+        where u.del_flag = '0'
+          and u.user_id IN (SELECT cg.user_id
+                            FROM im_group_user cg
+                            WHERE cg.group_id = #{groupId}
+                              and cg.del_flag = '0')
+    </select>
+</mapper>

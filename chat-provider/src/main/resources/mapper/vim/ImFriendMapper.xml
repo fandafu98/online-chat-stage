@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.vim.mapper.ImFriendMapper">
+    <resultMap id="userMap" type="com.example.api.vo.User">
+        <result column="u_id" property="id"/>
+        <result column="u_name" property="name"/>
+        <result column="u_avatar" property="avatar"/>
+        <result column="u_mobile" property="mobile"/>
+        <result column="u_mobile" property="mobile"/>
+        <result column="u_dept_id" property="deptId"/>
+    </resultMap>
+    <select id="getUserFriends" resultMap="userMap" >
+        SELECT
+            u.user_id AS u_id,
+            u.nick_name AS u_name,
+            u.avatar AS u_avatar,
+            u.phonenumber AS u_mobile,
+            u.sex AS u_sex,
+            u.dept_id AS u_dept_id
+        FROM
+            (
+                SELECT
+                    friend_id AS user_id
+                FROM
+                    im_friend
+                WHERE
+                    user_id = #{userId}
+                  AND state = #{state}
+                  AND del_flag='0'
+                UNION ALL
+                SELECT
+                    user_id AS user_id
+                FROM
+                    im_friend
+                WHERE
+                    friend_id = #{userId}
+                  AND state = #{state}
+                  AND del_flag='0'
+            ) ug
+                JOIN sys_user u ON u.user_id = ug.user_id and u.del_flag='0'
+    </select>
+</mapper>
